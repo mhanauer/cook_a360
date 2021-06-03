@@ -1,0 +1,52 @@
+---
+title: "Brand"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Load in data and packages
+
+Account number 
+Score 
+Date (by month)
+You will get a lot of data by month so you can do concurrent and predictive validity among that data
+Needs to be aggreagted by week or day if possible some way to get the number of rows the same.
+Will be flawed, because not a one to one comparision of a CES and sales data 
+
+Or we take a random sample of X number per month for laggers and leaders and then run a simluation to evaluate the correlation and 95%'s
+
+```{r}
+setwd("/data/data_for_analysis/matthew.hanauer/a360")
+
+library(DescTools)
+library(lubridate)
+acsi =rnorm(100)
+acsi = CutQ(acsi, breaks = quantile(acsi, c(0, .05, .1, .2, .30, .40, .5, .6, .7, .9, 1)), labels = c(1:10))
+ces = rnorm(100)
+ces = CutQ(ces, breaks = quantile(ces, c(0, .05, .14, .23, .33, .44, .5, .65, .72, .94, 1)), labels = c(1:10))
+loyalty = rnorm(100)
+loyalty = CutQ(loyalty, breaks = quantile(loyalty, c(0, .1, .15, .25, .30, .45, .5, .68, .7, .92, 1)), labels = c(1:10))
+
+sales_sample = seq(from  = 0, to  = 1000000, by = 10000)
+sales_dat = sample(sales_sample, 100, replace = TRUE)
+
+10*9*7 / 10^3
+
+dat_a360 = data.frame(acsi, ces, loyalty, sales_dat)
+
+library(dplyr)
+dat_a360 = dat_a360 %>%
+  mutate(touchpoint = c(rep("VISTA", 25), rep("Site Intercept", 25), rep("Field Signature", 25), rep("Billing Survey", 25))) %>%
+  mutate(touchpoint = sample(touchpoint, 100, replace = TRUE)) %>%
+  mutate(date = c(rep("2021-01-01", 25), rep("2021-02-01", 25), rep("2021-03-01", 25), rep("2021-04-01", 25))) %>%
+  mutate(date = ymd(date)) %>%
+  mutate(sales = round(5000*as.numeric(acsi)+6000*as.numeric(ces)+7000*as.numeric(loyalty) + rnorm(100),0)) %>%
+  
+dat_a360
+write.csv(dat_a360, "dat_a360.csv", row.names = FALSE)
+
+10/3
+```
+
